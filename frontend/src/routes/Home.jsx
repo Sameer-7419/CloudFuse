@@ -134,13 +134,6 @@ export default function Home() {
         console.log("OAuth completed successfully for:", event.data.provider);
         
         // Refresh account data to get the newly linked account
-        refreshAccountsData().then(() => {
-          const providerName = event.data.provider === 'google_drive' ? 'Google Drive' : 
-                              event.data.provider === 'dropbox' ? 'Dropbox' : 
-                              event.data.provider;
-          
-          alert(`${providerName} linked successfully!`);
-        });
       } else if (event.data.type === 'OAUTH_ERROR') {
         console.error("OAuth failed:", event.data.error);
         alert(`Account linking failed: ${event.data.error || 'Unknown error'}`);
