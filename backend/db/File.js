@@ -11,6 +11,9 @@ const fileSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    base64:{
+      type:String
+    },
     fileSize: {
       type: Number,
       required: true

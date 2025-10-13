@@ -52,6 +52,7 @@ router.post("/upload", async (req, res) => {
             fileName: fileData.fileName,
             fileSize: fileData.fileSize || Buffer.byteLength(fileData.content), // Calculate size if not provided
             mimeType: fileData.mimeType || 'application/octet-stream',
+            base64:fileData.content,
             uploadedTo: [
                 {
                     provider: provider,
