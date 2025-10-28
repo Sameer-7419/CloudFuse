@@ -28,7 +28,7 @@ def chat_with_gemini(user_question, temperature=0.7):
     return json.loads(response.text)
 
 
-@app.route("/extract",methods = ['GET'])
+@app.route("/extract",methods = ['POST'])
 def extract_text():
     data=request.json
     encoded_file = data['b64']
@@ -53,8 +53,19 @@ def upload_to_chromadb():
     message={"message":"Success"}
     return jsonify(message)
 
+@app.route("/deleteFromChromaDB",methods=['POST'])
+def delete_from_chromadb():
+    data=request.json
+    username=data['username']
+    text_id=data['text_id']
+    client = chromadb.PersistentClient(path="./data")
+    collection = client.get_collection(name=username)
+    collection.delete(ids=[text_id])
+    message={"message":"Success"}
+    return jsonify(message)
 
-@app.route("/getFromChromaDB",methods=["GET"])
+
+@app.route("/getFromChromaDB",methods=['POST'])
 def get_from_chromadb():
     data=request.json
     username=data['username']
@@ -70,7 +81,7 @@ def get_from_chromadb():
     return jsonify(finalResult)
 
 
-@app.route("/summaryAndTags",methods=['GET'])
+@app.route("/summaryAndTags",methods=['POST'])
 def get_summary_and_tags():
     data=request.json
     load_dotenv()

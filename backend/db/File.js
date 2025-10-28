@@ -22,6 +22,15 @@ const fileSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    summary:{
+      type:String
+    },
+    tags:{
+      type:[String]
+    },
+    text_content:{
+      type:String
+    },
     uploadedTo: [
       {
         provider: {

@@ -252,7 +252,6 @@ export default function FileDetails() {
                     <Label className="text-sm font-medium">Upload Date</Label>
                     <p className="text-sm text-muted-foreground mt-1">{formatDate(file.uploadedAt)}</p>
                   </div>
-                  <div>
                     <Label className="text-sm font-medium">Uploaded To</Label>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {file.uploadedTo.map((upload, index) => (
@@ -269,6 +268,19 @@ export default function FileDetails() {
                           </Badge>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Summary</Label>
+                    <p className="text-sm text-muted-foreground mt-1">{file.summary}</p>
+                  </div>
+                  <div>
+                  <div>
+                    <Label className="text-sm font-medium">Tags</Label>
+                    <div className="flex flex-row gap-4">
+                      {file.tags.map((tag)=>{
+                        return <p className="text-sm text-muted-foreground mt-1">{tag}</p>
+                      })}
                     </div>
                   </div>
                 </div>
