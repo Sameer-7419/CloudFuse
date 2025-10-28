@@ -1,0 +1,15 @@
+.textbox {
+  border: 1px solid #9b97a5;
+  height: 2rem;
+  box-sizing: border-box;
+  padding: 0px 10px;
+  outline: none;
+  transition: 0.2s ease-in-out;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.textbox:focus {
+  transition: 0.2s ease-in-out;
+  border: 1px solid blue;
+}

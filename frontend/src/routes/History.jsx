@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "@/components/custom/SearchBar";
 import axios from "axios";
 import { 
   ArrowLeft,
@@ -36,6 +37,7 @@ export default function History() {
   const [uploadHistory, setUploadHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [inputValue, setInputValue] = useState("");
 
   // Get auth token from localStorage
   const getAuthToken = useCallback(() => {
@@ -55,8 +57,8 @@ export default function History() {
   }, [getAuthToken]);
 
   // Fetch upload history from backend
-  useEffect(() => {
-    const fetchUploadHistory = async () => {
+
+  const fetchUploadHistory = useCallback(async () => {
       const token = getAuthToken();
       
       // More robust token validation
@@ -103,10 +105,13 @@ export default function History() {
       } finally {
         setIsLoading(false);
       }
-    };
+  },[createAuthenticatedRequest, getAuthToken, navigate]);
 
-    fetchUploadHistory();
-  }, [navigate, getAuthToken, createAuthenticatedRequest]);
+  useEffect(()=>{
+    if(!inputValue){
+      fetchUploadHistory();
+    }
+  },[inputValue,fetchUploadHistory]);
 
   // Helper functions to transform backend data
   const formatFileSize = (bytes) => {
@@ -396,6 +401,7 @@ export default function History() {
         </div>
       </header>
       <div className="max-w-6xl mx-auto space-y-6 p-8">
+        <SearchBar value={inputValue} setValue={setInputValue} setSemanticFile={setUploadHistory}    />
         {/* Stats Cards */}
         {!isLoading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -470,7 +476,7 @@ export default function History() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Search files..."
+                  placeholder="Search files according to stats..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9"

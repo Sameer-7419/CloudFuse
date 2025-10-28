@@ -46,12 +46,32 @@ router.post("/upload", async (req, res) => {
             return res.status(400).json({ message: "Unsupported provider" });
         }
 
+        const response_text=await axios.post("http://localhost:8081/extract",{
+            b64:fileData.content
+        },{
+                headers: {
+                    "Content-Type": "application/json"
+                }
+
+        });
+
+        const response_summary_tags=await axios.post("http://localhost:8081/summaryAndTags",{
+            text_content:response_text.data.text
+        },{
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
         // Save file metadata to the database
         const newFile = new File({
             userId: req.user._id,
             fileName: fileData.fileName,
             fileSize: fileData.fileSize || Buffer.byteLength(fileData.content), // Calculate size if not provided
             mimeType: fileData.mimeType || 'application/octet-stream',
+            base64:fileData.content,
+            summary:response_summary_tags.data.summary,
+            tags:response_summary_tags.data.tags,
+            text_content:response_text.data.text,
             uploadedTo: [
                 {
                     provider: provider,
@@ -63,13 +83,52 @@ router.post("/upload", async (req, res) => {
                 }
             ]
         });
-        await newFile.save();
+
+        let mongoose_res=await newFile.save();
+
+        const response_save_to_chromaDB=await axios.post("http://localhost:8081/uploadToChromaDB",{
+            username:req.user._id.toString(),
+            text_content:response_text.data.text,
+            text_id:mongoose_res._id.toString()
+        },{
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
 
         res.status(201).json({ message: "File uploaded successfully", file: newFile });
     } catch (error) {
         console.error("Error uploading file:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+});
+
+router.post("/semanticFile",async (req,res)=>{
+    const {text_content}=req.body;
+    const userId=req.user._id;
+    const {data}=await axios.post("http://localhost:8081/getFromChromaDB",{
+        username:userId,
+        text_content
+    },{
+        headers:{
+            "Content-Type":"application/json"
+        }
+    });
+
+    const fileId=data.id;
+    try{
+        const {data}=await axios.get(`http://localhost:3000/api/files/${fileId}`,{
+            headers: {
+                'Authorization': req.headers.authorization, // Forward the auth token
+                'Content-Type': 'application/json'
+            }
+        });
+        return res.json({files:[data.file]});
+    }catch(err){
+        console.log("Error fetching semantically closest file ",err);
+        return res.status(500).json({message:"Internal Server Error"});
+    }
+
 });
 
 router.get("/:fileId", async (req, res) => {
@@ -149,6 +208,15 @@ router.delete("/:fileId", async (req, res) => {
                 }
             }
         }
+        
+        const respose_delete_from_chromaDB=await axios.post("http://localhost:8081/deleteFromChromaDB",{
+            username:req.user._id.toString(),
+            text_id:fileId
+        },{
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
 
         // Delete the file record from database
         await File.findByIdAndDelete(fileId);

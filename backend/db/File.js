@@ -11,6 +11,9 @@ const fileSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    base64:{
+      type:String
+    },
     fileSize: {
       type: Number,
       required: true
@@ -18,6 +21,15 @@ const fileSchema = new mongoose.Schema({
     mimeType: {
       type: String,
       required: true
+    },
+    summary:{
+      type:String
+    },
+    tags:{
+      type:[String]
+    },
+    text_content:{
+      type:String
     },
     uploadedTo: [
       {
