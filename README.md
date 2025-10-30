@@ -58,7 +58,7 @@ node index.js
 ### 4. Start the python backend server
 
 ```bash
-cd pythonAPi
+cd pythonAPI
 python app.py
 ```
 
